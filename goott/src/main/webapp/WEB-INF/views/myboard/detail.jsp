@@ -21,7 +21,6 @@
 					<h4>
 						게시글 상세 - <small>조회수: <c:out value="${board.bviewsCnt}" /></small>
 					</h4>
-					수정 및 추가
 				</div>
 				<%-- /.panel-heading --%>
 				<div class="panel-body">
@@ -60,15 +59,33 @@
 	<%-- /.row --%>
 </div>
 <%-- /#page-wrapper --%>
+<form id="frmSendValue"><!-- 폼을 추가(list.jsp와 동일한 아이디의 form) -->
+	 <input type='hidden' name='bno' id="bno" value='<c:out value="${board.bno}"/>'>
+	 <input type='hidden' name='pageNum' value='${myBoardPagingDTO.pageNum}'>
+	 <input type='hidden' name='rowAmountPerPage' value='${myBoardPagingDTO.rowAmountPerPage}'>
+ 	<input type='hidden' name='scope' value='${myBoardPagingDTO.scope}'>
+ 	<input type='hidden' name='keyword' value='${myBoardPagingDTO.keyword}'>
+</form>
 <script>
 //게시물 수정 페이지로 이동 
+
+var frmSendValue = $("#frmSendValue");
+
 $("#BtnMoveModify").on("click",function(){
-	location.href='${contextPath}/myboard/modify?bno=<c:out value="${board.bno}"/>';
+	frmSendValue.attr("action","${contextPath}/myboard/modify");
+	frmSendValue.attr("method","get");
+	frmSendValue.submit();
+
 })
 
 //게시물 목록 페이지로 이동
 $("#BtnMoveList").on("click",function(){
-	location.href="${contextPath}/myboard/list";
+	
+	frmSendValue.find("#bno").remove();
+	frmSendValue.attr("action","${contextPath}/myboard/list");
+	frmSendValue.attr("method","get");
+	frmSendValue.submit();
+
 })
 
 var result='<c:out value="${result}"/>'; //컨트롤러로부터 전달받음

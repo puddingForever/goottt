@@ -49,6 +49,11 @@
 						<button type="button" class="btn btn-default" id="btnModify" data-oper="modify">수정</button>
 						<button type="button" class="btn btn-danger" id="btnRemove" data-oper="remove">삭제</button>
 						<button type="button" class="btn btn-info" id="btnList" data-oper="list">취소</button>
+						<input type='hidden' name='pageNum' value='${myBoardPagingDTO.pageNum}'>
+ 						<input type='hidden' name='rowAmountPerPage' value='${myBoardPagingDTO.rowAmountPerPage}'>
+						<input type='hidden' name='scope' value='${myBoardPagingDTO.scope}'> 
+ 						<input type='hidden' name='keyword' value='${myBoardPagingDTO.keyword}'> 
+					
 					</form>
 				</div>
 				<%-- /.panel-body --%>
@@ -74,8 +79,20 @@
 			frmModify.attr("action","${contextPath}/myboard/delete");
 		}
 		else if(operation=="list"){
-			frmModify.attr("action","${contextPath}/myboard/list").attr("method","get");
-			frmModify.empty();
+			 var pageNumInput = $("input[name='pageNum']").clone(); //추가
+			 var rowAmountInput = $("input[name='rowAmountPerPage']").clone(); //추가
+			 var scopeInput = $("input[name='scope']").clone();
+			 var keywordInput = $("input[name='keyword']").clone(); 
+			 
+			 frmModify.empty();
+			
+			 frmModify.attr("action","${contextPath}/myboard/list").attr("method","get");
+			 //복사된 input 요소를 다시 form에 추가
+			 frmModify.append(pageNumInput); 
+			 frmModify.append(rowAmountInput);
+			 frmModify.append(scopeInput); 
+			 frmModify.append(keywordInput); 
+		
 		}
 		
 		frmModify.submit();

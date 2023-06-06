@@ -2,13 +2,17 @@ package com.goott.spring.service;
 
 import java.util.List;
 
+import com.goott.spring.common.paging.MyBoardPagingDTO;
 import com.goott.spring.domain.MyBoardVO;
 
 public interface MyBoardService {
 	
 
 	//게시물 목록 조회
-	public List<MyBoardVO> getBoardList();
+	public List<MyBoardVO> getBoardList(MyBoardPagingDTO myBoardPagingDTO);
+	
+	//게시물 총 개수 조회 서비스 - 페이징 시 필요
+	public long getRowAmountTotal(MyBoardPagingDTO myBoardPagingDTO);
 	
 	//게시물 등록 (selectkey이용)
 	public long registerBoard(MyBoardVO myBoard);

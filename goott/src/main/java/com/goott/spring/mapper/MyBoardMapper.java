@@ -2,12 +2,17 @@ package com.goott.spring.mapper;
 
 import java.util.List;
 
+import com.goott.spring.common.paging.MyBoardPagingDTO;
 import com.goott.spring.domain.MyBoardVO;
 
 public interface MyBoardMapper {
 
 	//게시물 조회
-	public List<MyBoardVO> selectMyBoardList();
+	public List<MyBoardVO> selectMyBoardList(MyBoardPagingDTO myBoardPagingDTO);
+	
+	//총 게시글 
+	public long selectRowAmountTotal(MyBoardPagingDTO myBoardPagingDTO);
+
 	
 	//게시물 등록 (selectkey이용)
 	public Integer insertMyBoardSelectKey(MyBoardVO myBoard);

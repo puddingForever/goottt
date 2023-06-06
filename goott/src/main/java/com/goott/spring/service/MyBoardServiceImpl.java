@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.goott.spring.common.paging.MyBoardPagingDTO;
 import com.goott.spring.domain.MyBoardVO;
 import com.goott.spring.mapper.MyBoardMapper;
 
@@ -16,12 +17,21 @@ public class MyBoardServiceImpl implements MyBoardService{
 	}
 
 	
+	
+	
 	//게시물 목록 조회 
 	@Override
-	public List<MyBoardVO> getBoardList() {
+	public List<MyBoardVO> getBoardList(MyBoardPagingDTO myBoardPagingDTO) {
 		
-		return myBoardMapper.selectMyBoardList();
+		return myBoardMapper.selectMyBoardList(myBoardPagingDTO);
 	}
+
+	//게시물 총 개수 
+	@Override
+	public long getRowAmountTotal(MyBoardPagingDTO myBoardPagingDTO) {
+		return myBoardMapper.selectRowAmountTotal(myBoardPagingDTO);
+	}
+
 	
 	//게시물 등록
 	@Override
