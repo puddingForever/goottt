@@ -24,6 +24,7 @@
 	</beans:bean>
 	
 
-	<context:component-scan base-package="com.goott.spring"/>	
+	<context:component-scan base-package="com.goott.spring.service" />	
+	<context:component-scan base-package="com.goott.spring.controller" />
 	
 </beans:beans>

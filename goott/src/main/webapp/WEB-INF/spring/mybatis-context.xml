@@ -28,12 +28,18 @@ http://www.springframework.org/schema/context http://www.springframework.org/sch
 	<!--  mybatis-spring 연동 (dataSource빈 주입) -->
 	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
 		<property name="dataSource" ref="dataSource" />
+		<property name="mapperLocations">
+			<list>
+				<value>classpath:com/goott/spring/mapper/MyBoardMapper.xml</value>
+			</list>
+		</property>
+		
 	</bean>
 	
 	<bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate">
 		<constructor-arg index="0" ref="sqlSessionFactory" />
 	</bean>
-	
-	<mybatis-spring:scan base-package="com.goott.springproject.mapper"/>
+		
+	<mybatis-spring:scan base-package="com.goott.spring.mapper"/>
 
 </beans>

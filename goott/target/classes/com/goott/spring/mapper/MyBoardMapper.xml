@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- 마이바티스 xml표시 -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.goott.spring.mapper.MyBoardMapper">
+
+    <!-- 게시글 목록조회  -->
+	<select id="selectMyBoardList" resultType="com.goott.spring.domain.MyBoardVO">
+		SELECT bno,btitle,bcontent,bwriter,bregdate,
+			   bmoddate,bviewscnt,breplycnt,bdelflag
+		FROM book_ex.tbl_myboard
+	</select>
+
+	<!-- 게시글 등록  -->
+	<insert id="insertMyBoardSelectKey">
+		<selectKey keyProperty="bno" order="BEFORE" resultType="long">
+			SELECT book_ex.seq_myboard.nextval FROM dual
+		</selectKey>
+			INSERT INTO book_ex.tbl_myboard
+			VALUES (#{bno},#{btitle},#{bcontent},#{bwriter},
+			default,default,default,default,default)
+	</insert>
+
+	<!-- 특정 게시글 조회 -->
+	<select id="selectMyBoard" resultType="com.goott.spring.domain.MyBoardVO">
+		SELECT bno,btitle,bcontent,bwriter,bregdate,bmoddate,bviewscnt,breplycnt,bdelflag
+		 FROM book_ex.tbl_myboard
+		WHERE bno=#{bno}
+	</select>
+
+    <!--특정 게시글 삭제 요청- bdelflag = 1 -->
+    <update id="updateBdelFlag">
+    	UPDATE book_ex.tbl_myboard
+		   SET bdelflag = 1
+		 WHERE bno=#{bno}
+    </update>
+    
+    <!--특정 게시글 삭제 (실제 삭제) -->
+    <delete id="deleteMyBoard">
+    	DELETE book_ex.tbl_myboard
+		WHERE bno = #{bno}
+    </delete>
+    
+   <!-- 게시물 삭제(관리자) - bdelflag=1 전체삭제  -->
+   <delete id="deleteAllBoardSetDeleted">
+   		DELETE book_ex.tbl_myboard
+		WHERE bdelflag = 1
+   </delete>
+   
+   <!--특정 게시물 수정 -->
+   <update id="updateMyBoard">
+   	UPDATE book_ex.tbl_myboard
+	SET btitle = #{btitle},
+	    bcontent =#{bcontent},
+	    bmoddate = default
+	WHERE bno=#{bno}
+   </update>
+    
+    <!-- 특정게시물 조회수 증가  -->
+    <update id="updateBviewsCnt">
+    	UPDATE book_ex.tbl_myboard
+    	   SET bviewsCnt = bviewsCnt + 1
+    	 WHERE bno = #{bno}
+    </update>
+    
+    
+	
+</mapper>
