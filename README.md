@@ -200,7 +200,7 @@ MyBoardMapper<br>
 </select>
 ```
 마이바티스의 trim은 if문과 비슷한 것 ! 조건절을 설정하는 것이다. myBoardPagingDTO에 설정해둔 scopeArray의 배열의 값에 따라 찾는 범위를 각각 설정함 <br>
-즉 myBoardPagingDTO에 배열값으로 받은 검색범위(T,C,W)를 하나하나 뺴서 , <choose>절에서 조건을 검색함<br>
+즉 myBoardPagingDTO에 배열값으로 받은 검색범위(T,C,W)를 하나하나 뺴서 , choose절에서 조건을 검색함<br>
 T인 경우 , btitle,, C인 경우 bcontent, W인 경우 bwriter로 #{keyword}의 값이 들어있는 검색 조건을 찾음 <br>
 ```
 <trim prefix="OR">
