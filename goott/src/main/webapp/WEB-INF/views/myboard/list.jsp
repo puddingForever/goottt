@@ -259,7 +259,7 @@ $("#btnSearchGo").on("click", function(e) {
 	 }
  
  //if (!frmSendValue.find("input[name='keyword']").val()) {
- if (!( (frmSendValue.find("input[name='keyword']").val()) ||
+ if (! (frmSendValue.find("input[name='keyword']").val()) ||
  		(frmSendValue.find("input[name='keyword']").val() !="") ) {
 	 alert("검색어를 입력하세요");
 	 return false;

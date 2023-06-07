@@ -31,6 +31,7 @@ http://www.springframework.org/schema/context http://www.springframework.org/sch
 		<property name="mapperLocations">
 			<list>
 				<value>classpath:com/goott/spring/mapper/MyBoardMapper.xml</value>
+				<value>classpath:com/goott/spring/mapper/MyReplyMapper.xml</value>
 			</list>
 		</property>
 		
