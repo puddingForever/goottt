@@ -44,71 +44,183 @@
 	<input  class="inputFile" type="file" name="uploadFiles"  /><br>
 </div>
 <button id="btnFileUpload" type="button">File Upload With Ajax</button>
+<div class="fileUploadResult">
+ <ul>
+ <%-- 업로드 후 처리결과가 표시될 영역 --%>
+ </ul>
+</div>
+
+
+<div class='bigImageWrapper'>
+	<div class='bigImage'>
+	<!-- 이미지파일이 표시되는 DIV -->
+	</div>
+</div>
 
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
 <script type="text/javascript">
 
 
-//파일 업로드 제한 
-function checkUploadfile(filename,fileSize){
+
+
+
+function checkUploadFile(fileName,fileSize){
 	
-	var maxSizeAllowed = 1048576;
-	var regExpFileExtension=/(.*)\.(exe|sh|zip|alz)$/i;
+	var maxAllowedSize = 10485760;
+	var regExpFileExtension = /(.*)\.(exe|sh|zip|alz|dll|c)$/i ;
 	
-	if(fileSize>= maxSizeAllowed ){
-		alert("업로드 파일 크기 초과");
+	//최대 허용 크기 제한 검사 
+	if(fileSize > maxAllowedSize){
+		alert("업로드 파일의 크기는 1MB를 넘을 수 없습니다. ");
 		return false;
 	}
 	
-	if(regExpFileExtension.test(filename)){
-		alert("exe|sh|zip|alz 형식 업로드 불가 ")
+	//업로드파일의 확장자 검사
+	if(regExpFileExtension.test(fileName)){
+		alert("해당 종류(exe, sh, zip, alz, dll, c)에 파일은 업로드 할 수 없습니다.")
 		return false;
 	}
 	
 	return true;
 }
 
-//파일 업로드 처리 
-$("#btnFileUpload").on("click",function(e){
+
+//input 초기화를 위해 div 요소의 비어있는 input 요소를 복사해서 저장함 
+var cloneFileInput = $(".uploadDiv").clone(); //uploadDiv의 자식을 복사함 
+//console.log("cloneFileInput: \n" +  cloneFileInput.html());
+
+//업로드 결과 표시 함수 
+function showUploadResult(uploadResult){
+	
+	//객체가 없으면 (업로드할 파일이 없으면)
+	if(!uploadResult || uploadResult.length == 0){
+		return ;
+	}
+	
+	
+	var fileUploadResult = $(".fileUploadResult ul");
+	var str = "";
+	
+	$(uploadResult).each(function(i,obj){ //index, 자바스크립트 객체 
+	
+		var fullFileName = encodeURI(obj.repoPath + "/" + obj.uploadPath
+				           +"/" + obj.uuid + "_" + obj.fileName);
 		
+		if(obj.fileType == "F"){
+			
+													
+			str  += "<li>"
+				 +  "  <a href='${contextPath}/filedownloadAjax?fileName="+fullFileName+"'>"  
+				 + "        <img src='${contextPath}/resources/img/attach.png'"
+				 + " 		alt='No Icon' style='height: 18px; width: 18px;'>" + obj.fileName
+				 + "   </a>"
+				 + " </li>";	 
+		}else if(obj.fileType == "I"){ // 이미지파일일떄 
+			
+			var thumbnailFileName = encodeURI(obj.repoPath + "/" + obj.uploadPath
+									+"/s_" + obj.uuid + "_" + obj.fileName);
+		
+	     // console.log("thumbnailFileName" + thumbnailFileName);
+			
+			str += "<li>"
+	//			 +  "  <a href='${contextPath}/filedownloadAjax?fileName="+fullFileName+"'>"  
+				 +  "  <a href=\"javascript:showImage('"+fullFileName+"')\">"  
+     //                     <a href=\"javascript:showImage('파일이름변수')">
+				 + "     <img src='${contextPath}/displayThumbnail?fileName="+thumbnailFileName + "'"
+				 + "        alt='No Icon' style='height:18px;width:18px;'>"
+				 + obj.fileName
+				 +"   </a>"
+				 + "</li>";
+		}			
+	});	
+	fileUploadResult.append(str);
+}
+
+
+//함수: 이미지를 다운로드 받아서 웹 브라우저에 표시 
+function showImage(fullFileName){
 	
+	$(".bigImageWrapper").css("display","flex").show();
+	$(".bigImage").html("<img src='${contextPath}/filedownloadAjax?fileName="
+			 						+fullFileName+"'>")
+				//  .animate({width:'100%', height:'100%'}, 1000);    //1초안에 이미지가 나옴		
+	       		    .animate({height:'100%'}, 1000);  
+}
+
+//이미지 제거 
+$(".bigImageWrapper").on("click",function(){
+	
+	$(".bigImage").animate({width:'0%', height: '0%'},3000); //3초 안에 없앰 
+	
+	setTimeout(function(){
+		$(".bigImageWrapper").hide();
+	},2500); // 2.5초동안 hide 실행 할 것임 !! 
+	
+   // $(".bigImageWrapper").hide();
+})
+
+//업로드 요청
+$("#btnFileUpload").on("click",function(){
+	
+	//ajax로 파일 전송시에 사용되는 WEB api 클래스의 생성자(브라우저에 있는거) 
 	var formData = new FormData();
-	var inputFiles = $("input[name='uploadFiles']"); // 배열 두개로 들어감 
 	
+	// input 요소 두개가 저장됨 
+	var inputFiles = $("input[name='uploadFiles']");
+/*	
+	var myFiles = inputFiles[0].files; // files 타입의 input 요소			
+	for(var i = 0; i < myFiles.length; i++){
+		
+		formData.append("uploadFiles", myFiles[i]);
+		
+	}
+	
+*/		 
+	
+	//input이 하나인 경우에는 다음처럼 한 줄을 적으면 됨
+    //var myFiles = inputFiles[0].files; 하나가 입력되도 name 속성이라서 배열 형태로 들어감 
+	
+    
+	//input에서 파일 추출
 	var myFiles = [];
 	
 	for(var i=0; i<inputFiles.length; i++){
-		
-		myFiles = inputFiles[i].files; 
+		myFiles = inputFiles[i].files;
 
-		for(var j=0; j<myFiles.length; j++){
-			if(!checkUploadfile(myFiles[i].name,myFiles.size)){
-				return false;
-			}
-			formData.append("uploadFiles",myFiles[j]);
-		}
-		
-	}//end-for i
-	
-	//formData보내주기 : form요소는 url을 통해 처리 후 , jsp페이지 호출에 의한 페이지 전환이 발생 , 
-	//FormData는 페이지 전환없이 폼 데이터만을 제출하고 싶을 떄 form대신 사용됨 ! 
-	
-	$.ajax({
-		type:"post",
-		url:"${contextPath}/fileUploadAjaxAction",
-		data:formData, // 
-		processData:false, // contenttype의 설정으로 data를 처리하지 않음 
-		contentType:false, //contentType에 mime타입을 지정하지 않음 
-		dataType:"text",
-		success:function(uploadResult){
-			alert("upload success\n");
+		for(var j = 0 ; j < myFiles.length; j++ ) {			
+			if(!checkUploadFile(myFiles[j].name,myFiles[j].size)){
+				return ;
+			}				
+			formData.append("uploadFiles",myFiles[j])			
 		}		
-		
-	});//end-ajax
+	}
+	
+	
+	
+	
+	//formData 보내주기 
+	$.ajax({
+			type:"post",
+			url:"${contextPath}/fileUploadAjaxAction",
+			data: formData,
+			processData: false, //서버가 contenttype 알아서 지정함 
+			contentType: false, // contentType에 설정된 형식으로 data를 처리하지 않음 
+			dataType:"json",
+			success: function(uploadResult){		
+				
+				console.log(uploadResult);		
+				$(".uploadDiv").html(cloneFileInput.html()); // 비어있는 input요소로 됨(위에서 비어있는 요소를 복사했기 때문!)
+				//$(".uploadDiv .inputFile").each(function(i,e){
+				//	$(e).val("");
+				//})
+				
+				showUploadResult(uploadResult);
+				
+			}
+		});
 	
 })
-
 
 
 

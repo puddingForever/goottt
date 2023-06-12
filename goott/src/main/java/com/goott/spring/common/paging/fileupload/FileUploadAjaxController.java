@@ -5,9 +5,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -55,37 +59,52 @@ public class FileUploadAjaxController {
 		return strDatefmtPathName;
 	}
 	
+	
+	
 	//업로드 요청 (파일 저장 및 결과 메시지 전송)
-	@PostMapping(value="/fileUploadAjaxAction",
-			produces= "text/plain; charset=UTF-8")
+	@PostMapping(value="/fileUploadAjaxAction",produces= {"application/json; charset=UTF-8"})
 	@ResponseBody
-	public String fileUploadActionPost(MultipartFile[] uploadFiles) { //formData.append("uploadFiles",myFiles[j]);
+	public ResponseEntity<List<AttachFileDTO>> fileUploadActionPost(MultipartFile[] uploadFiles) { //formData.append("uploadFiles",myFiles[j]);
 		
 	
+		//업로드 파일 각각에 대한 피드백 정보를 담을 리스트 객체 
+		List<AttachFileDTO> listAttachInfo = new ArrayList<AttachFileDTO>();
+		
+		String strDatefmtPathName = getDatefmtPathName();
 		//날짜형식 폴더구조 생성(yyyy/MM/dd)
-		File fileUploadPath = new File(uploadFileRepoDir,getDatefmtPathName());
+		File fileUploadPath = new File(uploadFileRepoDir,strDatefmtPathName);
 		
 		//경로 존재 X , 폴더구조 생성 
 		if(!fileUploadPath.exists()) {
 			fileUploadPath.mkdirs();
 		}
 		
-		String strUploadFileName = null;
 		for(MultipartFile multipartUploadFile : uploadFiles) {
-			//원본 파일 이름 
-			strUploadFileName = multipartUploadFile.getOriginalFilename();
+			
+			AttachFileDTO attachInfo = new AttachFileDTO();
+			
+			attachInfo.setRepoPath(uploadFileRepoDir.toString());
+			
+			attachInfo.setUploadPath(strDatefmtPathName.toString());
+			
+			
+			//업로드 파일이름 원본 문자열
+			String strUploadFileName = multipartUploadFile.getOriginalFilename();
+			
 			strUploadFileName = strUploadFileName.substring(strUploadFileName.lastIndexOf("\\")+1);
+			
+			attachInfo.setFileName(strUploadFileName);
+			
 			
 			
 			//랜덤파일이름 생성
 			UUID uuid = UUID.randomUUID();
+			attachInfo.setUuid(uuid.toString());
+			
 			//파일 확장자땜 uuid 앞에 추가 
 			strUploadFileName = uuid.toString() + "_" + strUploadFileName;
 		
-			
-			//업로드 stream 
-			//File saveUploadFile = new File(uploadFileRepoDir,strUploadFileName);
-			
+		
 			//날짜 폴더 구조 , 파일이름 
 			File saveUploadFile = new File(fileUploadPath,strUploadFileName);
 			
@@ -98,8 +117,10 @@ public class FileUploadAjaxController {
 				//이미지파일여부 확인 
 				if(checkIsImageForUploadFile(saveUploadFile)) {
 					
+					attachInfo.setFileType("I");
+					
 					FileOutputStream outputStreamForThumbnail = 
-							new FileOutputStream(new File(fileUploadPath,"s"+strUploadFileName));
+							new FileOutputStream(new File(fileUploadPath,"s_"+strUploadFileName));
 					
 					
 					Thumbnailator.createThumbnail(multipartUploadFile.getInputStream(),//원본파일 읽고 
@@ -107,7 +128,12 @@ public class FileUploadAjaxController {
 												20,20); //px
 				
 					outputStreamForThumbnail.close();
+				}else {
+					attachInfo.setFileType("F");
+					
 				}
+				
+				
 			} catch (IllegalStateException |IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -115,8 +141,7 @@ public class FileUploadAjaxController {
 			
 			
 		}
-			
-		return "파일 업로드 성공";
+			return new ResponseEntity<List<AttachFileDTO>>(listAttachInfo,HttpStatus.OK);
 	}
 	
 }

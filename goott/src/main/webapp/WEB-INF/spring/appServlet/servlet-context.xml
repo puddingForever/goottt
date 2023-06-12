@@ -27,8 +27,7 @@
 	<context:component-scan base-package="com.goott.spring.service" />	
 	<context:component-scan base-package="com.goott.spring.controller" />
 	<context:component-scan base-package="com.goott.spring.common.paging.fileupload" />
-	
-	
+	<context:component-scan base-package="com.goott.spring.common.filedownload"></context:component-scan>	
 	<!-- 멀티파티 업로드 구성을 위한 multipartResolver 빈설정 -->
 	<beans:bean id="multipartResolver"
 class= "org.springframework.web.multipart.support.StandardServletMultipartResolver"/>
