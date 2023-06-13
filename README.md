@@ -37,7 +37,15 @@ form요소는 url을 통해 처리 후 , jsp페이지 호출에 의한 페이지
   })
   
 ```
- <strong> processData키와 contentType 키는 반드시 false로 지정! 전송방식은 반드시 Post</strong>
+
+* 파일전송시, processData와 contentType은 false
+1. processData : false ? 
+false로 설정하면 jQuery가 데이터를 처리하는 것을 중지한다. 즉, processData가 false인 경우 jQuery는 쿼리 문자열로 인코딩하여 수정하려는 시도 없이 Ajax 요청에서 데이터로 지정한 모든 것을 단순히 보낸다. data 파라미터로 전달된 데이터를 jQuery는 내부적으로 query string 으로 만드는데, 파일 전송의 경우 이를 하지 않아야 하고 이를 설정하는 것이 processData: false 임 !!
+
+2. contentType: false ?
+contentType이 false로 설정되면 jQuery가 multipart/form-data를 사용함을 의미함 ! 
+default값이 "application/x-www-form-urlencoded; charset=UTF-8" 이기 때문에 이를 "multipart/form-data"로 전송이 되게 false로 바꿔주는 역할을 함
+
   
 * MultipartFile 클래스 주요 메소드 
 1. String getName() : 파라메터의 이름(input 태그의 이름) 반환
@@ -45,15 +53,7 @@ form요소는 url을 통해 처리 후 , jsp페이지 호출에 의한 페이지
 3. long getSize() : 업로드되는 파일의 크기 
 4. transferTo(File file) : 파일 저장
  
-  
-  
-  
-  
-  
-  
-  
-  
-  
+ 
   
   
   
